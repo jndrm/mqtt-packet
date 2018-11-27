@@ -3,6 +3,7 @@
 namespace Drmer\Mqtt\Packet;
 
 use Drmer\Mqtt\Packet\Protocol\Version;
+use Drmer\Mqtt\Packet\Protocol\Version4;
 
 abstract class ControlPacket {
 
@@ -13,29 +14,21 @@ abstract class ControlPacket {
 
     protected $identifier;
 
-    public function __construct(Version $version)
+    protected $rawData = null;
+
+    public function __construct()
+    {
+        $this->version = new Version4();
+    }
+
+    public function setVersion(Version $version)
     {
         $this->version = $version;
     }
 
-    /**
-     * @param Version $version
-     * @param string $rawInput
-     * @return static
-     */
-    public static function parse(Version $version, $rawInput)
+    public function parse($rawData)
     {
-        static::checkRawInputValidControlPackageType($rawInput);
-
-        return new static($version);
-    }
-
-    protected static function checkRawInputValidControlPackageType($rawInput)
-    {
-        $packetType = ord($rawInput{0}) >> 4;
-        if ($packetType !== static::getControlPacketType()) {
-            throw new \RuntimeException('raw input is not valid for this control packet');
-        }
+        $this->rawData = $rawData;
     }
 
     /** @return int */

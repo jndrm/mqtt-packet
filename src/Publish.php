@@ -10,8 +10,6 @@ use Drmer\Mqtt\Packet\Protocol\Version;
  */
 class Publish extends ControlPacket
 {
-    const EVENT = 'PUBLISH';
-
     protected $messageId;
 
     protected $topic = '';
@@ -27,31 +25,25 @@ class Publish extends ControlPacket
         return ControlPacketType::PUBLISH;
     }
 
-    public static function parse(Version $version, $rawInput)
+    public function parse($rawInput)
     {
-        /** @var Publish $packet */
-        $packet = parent::parse($version, $rawInput);
-
-        //TODO 3.3.2.2 Packet Identifier not yet supported
         $topic = static::getPayloadLengthPrefixFieldInRawInput(2, $rawInput);
-        $packet->setTopic($topic);
+        $this->setTopic($topic);
 
         $byte1 = $rawInput{0};
         if (!empty($byte1)) {
-            $packet->setRetain(($byte1 & 1) === 1);
+            $this->setRetain(($byte1 & 1) === 1);
             if (($byte1 & 2) === 2) {
-                $packet->setQos(1);
+                $this->setQos(1);
             } elseif (($byte1 & 4) === 4) {
-                $packet->setQos(2);
+                $this->setQos(2);
             }
-            $packet->setDup(($byte1 & 8) === 8);
+            $this->setDup(($byte1 & 8) === 8);
         }
-        $packet->payload = substr(
+        $this->payload = substr(
             $rawInput,
             4 + strlen($topic)
         );
-
-        return $packet;
     }
 
     /**

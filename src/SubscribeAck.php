@@ -8,8 +8,6 @@ namespace Drmer\Mqtt\Packet;
  */
 class SubscribeAck extends ControlPacket
 {
-    const EVENT = 'SUBSCRIBE_ACK';
-
     public static function getControlPacketType()
     {
         return ControlPacketType::SUBACK;

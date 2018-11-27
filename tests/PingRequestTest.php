@@ -14,8 +14,7 @@ class PingRequestTest extends TestCase {
 
     public function testGetHeaderTestFixedHeader()
     {
-        $version = new Version4();
-        $packet = new PingRequest($version);
+        $packet = new PingRequest();
 
         $this->assertEquals(
             substr($packet->get(), 0, 2),

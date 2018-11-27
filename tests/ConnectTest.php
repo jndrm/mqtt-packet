@@ -4,7 +4,7 @@ namespace Drmer\Tests\Mqtt\Packet;
 
 use Drmer\Mqtt\Packet\Protocol\Version4;
 use Drmer\Mqtt\Packet\Connect;
-use Drmer\Mqtt\Packet\MessageHelper;
+use Drmer\Mqtt\Packet\Utils\MessageHelper;
 
 class ConnectTest extends TestCase {
 
@@ -15,8 +15,9 @@ class ConnectTest extends TestCase {
 
     public function testGetHeaderTestFixedHeader()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect($version, null, null, 'clientid');
+        $packet = new Connect([
+            'clientId' => 'clientid',
+        ]);
 
         $this->assertEquals(
             MessageHelper::getReadableByRawString(chr(1 << 4) . chr(20)),
@@ -26,9 +27,10 @@ class ConnectTest extends TestCase {
 
     public function testGetHeaderTestVariableHeaderWithoutConnectFlags()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect($version, null, null, 'clientid', false);
-
+        $packet = new Connect([
+            'clientid' => 'clientid',
+            'cleanSession' => false,
+        ]);
         $this->assertEquals(
             MessageHelper::getReadableByRawString(
                 chr(0) .    // byte 1
@@ -45,8 +47,7 @@ class ConnectTest extends TestCase {
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagsCleanSession()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect($version);
+        $packet = new Connect();
 
         $this->assertEquals(
             MessageHelper::getReadableByRawString(
@@ -64,10 +65,12 @@ class ConnectTest extends TestCase {
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagWillFlag()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, null, null, 'clientId', false, 'willTopic', 'willMessage'
-        );
+        $packet = new Connect([
+            'clientId' => 'clientId',
+            'cleanSession' => false,
+            'willTopic' => 'willTopic',
+            'willMessage' => 'willMessage',
+        ]);
 
         $this->assertEquals(
             MessageHelper::getReadableByRawString(
@@ -85,10 +88,11 @@ class ConnectTest extends TestCase {
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagWillRetain()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, null, null, 'clientId', false, null, null, null, true
-        );
+        $packet = new Connect([
+            'clientId' => 'clientId',
+            'cleanSession' => false,
+            'willRetain' => true,
+        ]);
 
         $this->assertEquals(
             MessageHelper::getReadableByRawString(
@@ -106,10 +110,11 @@ class ConnectTest extends TestCase {
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagUsername()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, 'username', null, 'clientId', false, false, null, false
-        );
+        $packet = new Connect([
+            'username' => 'username',
+            'clientId' => 'clientId',
+            'cleanSession' => false,
+        ]);
 
         $this->assertEquals(
             MessageHelper::getReadableByRawString(
@@ -127,10 +132,11 @@ class ConnectTest extends TestCase {
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagPassword()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, null, 'password', 'clientId', false, false, null, false
-        );
+        $packet = new Connect([
+            'password' => 'password',
+            'clientId' => 'clientId',
+            'cleanSession' => false,
+        ]);
 
         $this->assertEquals(
             MessageHelper::getReadableByRawString(
@@ -148,10 +154,11 @@ class ConnectTest extends TestCase {
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagWillWillQos()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, null, null, 'clientId', false, null, null, true, null
-        );
+        $packet = new Connect([
+            'clientId' => 'clientId',
+            'cleanSession' => false,
+            'willQos' => true,
+        ]);
 
         $this->assertEquals(
             MessageHelper::getReadableByRawString(
@@ -169,10 +176,11 @@ class ConnectTest extends TestCase {
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagUserNamePasswordCleanSession()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, 'username', 'password', 'clientId', true, false, null, false
-        );
+        $packet = new Connect([
+            'username' => 'username',
+            'password' => 'password',
+            'clientId' => 'clientId',
+        ]);
 
         $this->assertEquals(
             MessageHelper::getReadableByRawString(
@@ -190,10 +198,9 @@ class ConnectTest extends TestCase {
 
     public function testBytesNineAndTenOfVariableHeaderAreKeepAlive()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new \Drmer\Mqtt\Packet\Connect(
-            $version, null, null, null, true, null, null, null, null, 999
-        );
+        $packet = new Connect([
+            'keepAlive' => 999,
+        ]);
 
         $this->assertEquals(
             MessageHelper::getReadableByRawString(
@@ -211,8 +218,9 @@ class ConnectTest extends TestCase {
 
     public function testGetHeaderTestPayloadClientId()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect($version, null, null, 'clientid');
+        $packet = new Connect([
+            'clientId' => 'clientid',
+        ]);
 
         $this->assertEquals(
             substr($packet->get(), 12),

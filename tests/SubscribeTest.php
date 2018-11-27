@@ -3,7 +3,7 @@
 namespace Drmer\Tests\Mqtt\Packet;
 
 use Drmer\Mqtt\Packet\Subscribe;
-use Drmer\Mqtt\Packet\MessageHelper;
+use Drmer\Mqtt\Packet\Utils\MessageHelper;
 
 class SubscribeTest extends TestCase {
 
@@ -14,8 +14,7 @@ class SubscribeTest extends TestCase {
 
     public function testGetHeaderTestFixedHeader()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Subscribe($version);
+        $packet = new Subscribe();
 
         $subscriptionTopic = 'a/b';
         $packet->addSubscription($subscriptionTopic, 0);
@@ -28,8 +27,7 @@ class SubscribeTest extends TestCase {
 
     public function testGetHeaderTestFixedHeaderWithTwoSubscribedTopics()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Subscribe($version);
+        $packet = new Subscribe();
 
         $subscriptionTopic = 'a/b';
         $packet->addSubscription($subscriptionTopic, 1);

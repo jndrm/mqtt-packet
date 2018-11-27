@@ -3,6 +3,7 @@
 namespace Drmer\Mqtt\Packet;
 
 use Drmer\Mqtt\Packet\Protocol\Version;
+use Drmer\Mqtt\Packet\Protocol\Version4;
 
 /**
  * After a Network Connection is established by a Client to a Server, the
@@ -39,38 +40,26 @@ class Connect extends ControlPacket {
 
     /**
      * @param Version $version
-     * @param string|null $username
-     * @param string|null $password
-     * @param string|null $clientId
-     * @param bool $cleanSession
-     * @param string|null $willTopic
-     * @param string|null $willMessage
-     * @param bool|null $willQos
-     * @param null $willRetain
-     * @param int $keepAlive
+     * @param ConnectionOptions|Array|null $opts
      */
-    public function __construct(
-        Version $version,
-        $username = null,
-        $password = null,
-        $clientId = null,
-        $cleanSession = true,
-        $willTopic = null,
-        $willMessage = null,
-        $willQos = null,
-        $willRetain = null,
-        $keepAlive = 0
-    ) {
-        parent::__construct($version);
-        $this->clientId = $clientId;
-        $this->username = $username;
-        $this->password = $password;
-        $this->cleanSession = boolval($cleanSession);
-        $this->willTopic = $willTopic;
-        $this->willMessage = $willMessage;
-        $this->willQos = boolval($willQos);
-        $this->willRetain = $willRetain;
-        $this->keepAlive = $keepAlive;
+    public function __construct($opts=null)
+    {
+        parent::__construct();
+        $options = $opts;
+        if (is_array($opts)) {
+            $options = new ConnectionOptions($opts);
+        }
+        if ($options) {
+            $this->clientId = $options->clientId;
+            $this->username = $options->username;
+            $this->password = $options->password;
+            $this->cleanSession = boolval($options->cleanSession);
+            $this->willTopic = $options->willTopic;
+            $this->willMessage = $options->willMessage;
+            $this->willQos = boolval($options->willQos);
+            $this->willRetain = $options->willRetain;
+            $this->keepAlive = $options->keepAlive;
+        }
         $this->buildPayload();
     }
 

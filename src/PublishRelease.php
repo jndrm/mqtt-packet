@@ -8,10 +8,18 @@ namespace Drmer\Mqtt\Packet;
  */
 class PublishRelease extends ControlPacket
 {
-    const EVENT = 'PUBLISH_RELEASE';
-
     public static function getControlPacketType()
     {
         return ControlPacketType::PUBREL;
+    }
+
+    protected function getVariableHeader()
+    {
+        return pack('n', 0);
+    }
+
+    protected function addReservedBitsToFixedHeaderControlPacketType($byte1)
+    {
+        return $byte1 + 2;
     }
 }

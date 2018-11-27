@@ -8,8 +8,6 @@ namespace Drmer\Mqtt\Packet;
  */
 class PingResponse extends ControlPacket
 {
-    const EVENT = 'PING_RESPONSE';
-
     public static function getControlPacketType()
     {
         return ControlPacketType::PINGRESP;

@@ -8,8 +8,6 @@ namespace Drmer\Mqtt\Packet;
  */
 class PublishReceived extends ControlPacket
 {
-    const EVENT = 'PUBLISH_RECEIVED';
-
     public static function getControlPacketType()
     {
         return ControlPacketType::PUBREC;

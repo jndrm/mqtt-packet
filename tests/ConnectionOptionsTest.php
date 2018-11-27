@@ -5,13 +5,6 @@ namespace Drmer\Tests\Mqtt\Packet;
 use Drmer\Mqtt\Packet\ConnectionOptions;
 use Drmer\Mqtt\Packet\QoS\Levels;
 
-/**
- * Class ConnectionOptionsTest
- *
- * @group connection-options
- *
- * @author Alin Eugen Deac <ade@vestergaardcompany.com>
- */
 class ConnectionOptionsTest extends TestCase
 {
 
