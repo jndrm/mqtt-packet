@@ -10,7 +10,7 @@ use Drmer\Mqtt\Packet\Protocol\Version;
  */
 class Publish extends ControlPacket
 {
-    use HasMessageId;
+    const ID_INDEX = -1;
 
     protected $topic = '';
 
@@ -42,7 +42,7 @@ class Publish extends ControlPacket
             $this->setDup(($byte1 & 8) === 8);
         }
         if ($this->qos > 0) {
-            $this->parseMessageId($rawInput, 4 + strlen($topic));
+            $this->identifier = $this->parseIdentifier($rawInput, 4 + strlen($topic));
             $this->payload = substr($rawInput, 6 + strlen($topic));
         } else {
             $this->payload = substr($rawInput, 4 + strlen($topic));
@@ -123,7 +123,7 @@ class Publish extends ControlPacket
         return implode([
             $this->getFixedHeader(),
             $this->getVariableHeader(),
-            ($this->qos > 0 ? pack('n', $this->messageId) : ''),
+            ($this->qos > 0 ? pack('n', $this->identifier) : ''),
             $this->getPayload(),
         ]);
     }

@@ -7,6 +7,11 @@ use Drmer\Mqtt\Packet\Protocol\Version4;
 
 abstract class ControlPacket {
 
+    // packet identifer index
+    // set this to -1 if subclass need to
+    // proccess identifier itself.
+    const ID_INDEX = 2;
+
     /** @var $version Version */
     protected $version;
 
@@ -24,12 +29,36 @@ abstract class ControlPacket {
         $this->version = $version;
     }
 
+    public function setIdentifier($identifier)
+    {
+        $this->identifier = $identifier;
+        return $this;
+    }
+
+    public function getIdentifier()
+    {
+        return $this->identifier;
+    }
+
     public function parse($rawInput)
     {
+        if (static::ID_INDEX > 0) {
+            $this->identifier = $this->parseIdentifier($rawInput, static::ID_INDEX);
+        }
+    }
+
+    public function parseIdentifier($rawInput, $startIndex)
+    {
+        if (strlen($rawInput) < $startIndex + 2) {
+            return null;
+        }
+        $identifier = unpack('n', substr($rawInput, $startIndex, 2));
+        return array_pop($identifier);
     }
 
     /** @return int */
-    public static function getControlPacketType() {
+    public static function getControlPacketType()
+    {
         throw new \RuntimeException('you must overwrite getControlPacketType()');
     }
 
@@ -68,7 +97,10 @@ abstract class ControlPacket {
      */
     protected function getVariableHeader()
     {
-        return '';
+        if (!$this->identifier) {
+            return '';
+        }
+        return pack('n', $this->identifier);
     }
 
     /**

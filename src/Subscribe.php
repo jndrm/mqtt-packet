@@ -25,9 +25,7 @@ class Subscribe extends ControlPacket {
      */
     protected function getVariableHeader()
     {
-        return chr(0)
-             . chr(10)
-        ;
+        return pack('n', $this->identifier);
     }
 
     /**

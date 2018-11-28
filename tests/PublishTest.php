@@ -41,7 +41,7 @@ class PublishTest extends TestCase {
         $packet = new Publish();
         $packet->setQos(1);
         $packet->setTopic('test');
-        $packet->setMessageId(1);
+        $packet->setIdentifier(1);
 
         $expected = implode([
             chr(0b00110010),
@@ -59,7 +59,7 @@ class PublishTest extends TestCase {
         $packet = new Publish();
         $packet->setQos(2);
         $packet->setTopic('test');
-        $packet->setMessageId(1);
+        $packet->setIdentifier(1);
 
         $expected = implode([
             chr(0b00110100),
@@ -152,7 +152,7 @@ class PublishTest extends TestCase {
         $messageId = 1;
 
         $packet = new Publish();
-        $return = $packet->setMessageId($messageId);
+        $return = $packet->setIdentifier($messageId);
         $this->assertInstanceOf('Drmer\Mqtt\Packet\Publish', $return);
     }
 
