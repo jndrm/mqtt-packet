@@ -29,7 +29,7 @@ class Connect extends ControlPacket {
     /** @var string|null  */
     protected $willMessage;
 
-    /** @var bool|null  */
+    /** @var int  */
     protected $willQos;
 
     /** @var null */
@@ -56,7 +56,7 @@ class Connect extends ControlPacket {
             $this->cleanSession = boolval($options->cleanSession);
             $this->willTopic = $options->willTopic;
             $this->willMessage = $options->willMessage;
-            $this->willQos = boolval($options->willQos);
+            $this->willQos = $options->willQos;
             $this->willRetain = $options->willRetain;
             $this->keepAlive = $options->keepAlive;
         }
@@ -66,7 +66,10 @@ class Connect extends ControlPacket {
     protected function buildPayload()
     {
         $this->addLengthPrefixedField($this->getClientId());
-        if (!is_null($this->willTopic) && !is_null($this->willMessage)) {
+        if (!is_null($this->willTopic)) {
+            if (is_null($this->willMessage)) {
+                $this->willMessage = '';
+            }
             $this->addLengthPrefixedField($this->willTopic);
             $this->addLengthPrefixedField($this->willMessage);
         }
@@ -125,8 +128,7 @@ class Connect extends ControlPacket {
         }
 
         if ($this->willQos) {
-            $connectByte += 1 << 3;
-            // 4 TODO ?
+            $connectByte += $this->willQos << 3;
         }
 
         if ($this->willRetain) {

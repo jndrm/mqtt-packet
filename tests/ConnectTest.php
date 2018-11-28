@@ -19,9 +19,9 @@ class ConnectTest extends TestCase {
             'clientId' => 'clientid',
         ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(chr(1 << 4) . chr(20)),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 0, 2))
+        $this->assertSerialisedPacketEquals(
+            chr(1 << 4) . chr(20),
+            substr($packet->get(), 0, 2)
         );
     }
 
@@ -31,17 +31,18 @@ class ConnectTest extends TestCase {
             'clientid' => 'clientid',
             'cleanSession' => false,
         ]);
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(0) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(0),    // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
@@ -49,17 +50,18 @@ class ConnectTest extends TestCase {
     {
         $packet = new Connect();
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(2) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(2),    // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
@@ -72,17 +74,18 @@ class ConnectTest extends TestCase {
             'willMessage' => 'willMessage',
         ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(4) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(4),    // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
@@ -94,17 +97,18 @@ class ConnectTest extends TestCase {
             'willRetain' => true,
         ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(32) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(32),   // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
@@ -116,17 +120,18 @@ class ConnectTest extends TestCase {
             'cleanSession' => false,
         ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(128) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(128),  // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
@@ -138,17 +143,18 @@ class ConnectTest extends TestCase {
             'cleanSession' => false,
         ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(64) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(64),   // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
@@ -160,17 +166,18 @@ class ConnectTest extends TestCase {
             'willQos' => true,
         ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(8) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(8),    // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
@@ -182,17 +189,18 @@ class ConnectTest extends TestCase {
             'clientId' => 'clientId',
         ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(194) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(194),  // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
@@ -202,17 +210,19 @@ class ConnectTest extends TestCase {
             'keepAlive' => 999,
         ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(2) .    // byte 8
-                chr(3) .    // byte 9
-                chr(231)    // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(2),    // byte 8
+            chr(3),    // byte 9
+            chr(231),  // byte 10
+        ]);
+
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
@@ -228,5 +238,49 @@ class ConnectTest extends TestCase {
             chr(8) .    // byte 2
             'clientid'
         );
+    }
+
+    public function testHeaderWithQos1()
+    {
+        $packet = new Connect([
+            'willTopic' => 'test',
+            'willQos' => 1,
+            'clientId' => '',
+        ]);
+        $expected = implode([
+            chr(16),
+            chr(20),
+            chr(0), chr(4),
+            'MQTT',
+            chr(4),
+            chr(14),
+            chr(0), chr(0), chr(0), chr(0),
+            chr(0), chr(4),
+            'test',
+            chr(0), chr(0),
+        ]);
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
+
+    public function testHeaderWithQos2()
+    {
+        $packet = new Connect([
+            'willTopic' => 'test',
+            'willQos' => 2,
+            'clientId' => '',
+        ]);
+        $expected = implode([
+            chr(16),
+            chr(20),
+            chr(0), chr(4),
+            'MQTT',
+            chr(4),
+            chr(22),
+            chr(0), chr(0), chr(0), chr(0),
+            chr(0), chr(4),
+            'test',
+            chr(0), chr(0),
+        ]);
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
     }
 }
