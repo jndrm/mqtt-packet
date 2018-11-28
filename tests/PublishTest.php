@@ -258,12 +258,4 @@ class PublishTest extends TestCase {
         $this->assertEquals($expected, $actual);
         $this->assertSerialisedPacketEquals($expected->get(), $actual->get());
     }
-
-    private function assertSerialisedPacketEquals($expected, $actual)
-    {
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString($expected),
-            MessageHelper::getReadableByRawString($actual)
-        );
-    }
 }
