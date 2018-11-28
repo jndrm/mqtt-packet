@@ -8,14 +8,11 @@ namespace Drmer\Mqtt\Packet;
  */
 class PublishRelease extends ControlPacket
 {
+    use HasMessageId;
+
     public static function getControlPacketType()
     {
         return ControlPacketType::PUBREL;
-    }
-
-    protected function getVariableHeader()
-    {
-        return pack('n', 0);
     }
 
     protected function addReservedBitsToFixedHeaderControlPacketType($byte1)

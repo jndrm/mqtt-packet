@@ -7,6 +7,8 @@ namespace Drmer\Mqtt\Packet;
  */
 class PublishAck extends ControlPacket {
 
+    use HasMessageId;
+
     public static function getControlPacketType()
     {
         return ControlPacketType::PUBACK;

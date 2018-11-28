@@ -10,7 +10,7 @@ use Drmer\Mqtt\Packet\Protocol\Version;
  */
 class Publish extends ControlPacket
 {
-    protected $messageId;
+    use HasMessageId;
 
     protected $topic = '';
 
@@ -27,6 +27,7 @@ class Publish extends ControlPacket
 
     public function parse($rawInput)
     {
+        parent::parse($rawInput);
         $topic = static::getPayloadLengthPrefixFieldInRawInput(2, $rawInput);
         $this->setTopic($topic);
 
@@ -40,10 +41,12 @@ class Publish extends ControlPacket
             }
             $this->setDup(($byte1 & 8) === 8);
         }
-        $this->payload = substr(
-            $rawInput,
-            4 + strlen($topic)
-        );
+        if ($this->qos > 0) {
+            $this->parseMessageId($rawInput, 4 + strlen($topic));
+            $this->payload = substr($rawInput, 6 + strlen($topic));
+        } else {
+            $this->payload = substr($rawInput, 4 + strlen($topic));
+        }
     }
 
     /**
@@ -53,16 +56,6 @@ class Publish extends ControlPacket
     public function setTopic($topic)
     {
         $this->topic = $topic;
-        return $this;
-    }
-
-    /**
-     * @param $messageId
-     * @return $this
-     */
-    public function setMessageId($messageId)
-    {
-        $this->messageId = $messageId;
         return $this;
     }
 

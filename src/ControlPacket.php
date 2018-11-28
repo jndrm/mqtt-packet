@@ -14,8 +14,6 @@ abstract class ControlPacket {
 
     protected $identifier;
 
-    protected $rawData = null;
-
     public function __construct()
     {
         $this->version = new Version4();
@@ -26,9 +24,8 @@ abstract class ControlPacket {
         $this->version = $version;
     }
 
-    public function parse($rawData)
+    public function parse($rawInput)
     {
-        $this->rawData = $rawData;
     }
 
     /** @return int */

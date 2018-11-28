@@ -8,6 +8,8 @@ namespace Drmer\Mqtt\Packet;
  */
 class PublishComplete extends ControlPacket {
 
+    use HasMessageId;
+
     public static function getControlPacketType()
     {
         return ControlPacketType::PUBCOMP;
