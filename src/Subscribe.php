@@ -37,4 +37,13 @@ class Subscribe extends ControlPacket {
         $this->payload .= $this->getLengthPrefixField($topic);
         $this->payload .= chr($qos);
     }
+
+    public function parse($rawInput)
+    {
+        parent::parse($rawInput);
+        $body = substr($rawInput, 4);
+        $topic = static::readString($body);
+        $qos = ord($body[0]) & 0x3;
+        $this->addSubscription($topic, $qos);
+    }
 }

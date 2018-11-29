@@ -13,6 +13,10 @@ use Drmer\Mqtt\Packet\PublishAck;
 use Drmer\Mqtt\Packet\PublishComplete;
 use Drmer\Mqtt\Packet\PublishReceived;
 use Drmer\Mqtt\Packet\PublishRelease;
+use Drmer\Mqtt\Packet\Subscribe;
+use Drmer\Mqtt\Packet\SubscribeAck;
+use Drmer\Mqtt\Packet\Unsubscribe;
+use Drmer\Mqtt\Packet\UnsubscribeAck;
 
 class ParserTest extends TestCase {
     public function testConnect()
@@ -172,8 +176,8 @@ class ParserTest extends TestCase {
 
     public function testPublishRelease()
     {
-        $received = new PublishRelease();
-        $received->setIdentifier(13);
+        $publishRelease = new PublishRelease();
+        $publishRelease->setIdentifier(13);
 
         $expected = implode([
             chr(98),
@@ -181,7 +185,7 @@ class ParserTest extends TestCase {
             chr(0), chr(13),
         ]);
 
-        $this->assertSerialisedPacketEquals($expected, $received->get());
+        $this->assertSerialisedPacketEquals($expected, $publishRelease->get());
 
         $packet = Parser::parse($expected);
 
@@ -190,5 +194,99 @@ class ParserTest extends TestCase {
         $this->assertSerialisedPacketEquals($expected, $packet->get());
 
         $this->assertEquals(13, $packet->getIdentifier());
+    }
+
+    public function testSubscribe()
+    {
+        $subscribe = new Subscribe();
+        $subscribe->setIdentifier(14);
+        $subscribe->addSubscription('test', 2);
+
+        $expected = implode([
+            chr(130),
+            chr(9),
+            chr(0), chr(14),
+            chr(0), chr(4),
+            'test',
+            chr(2),
+        ]);
+
+        $this->assertSerialisedPacketEquals($expected, $subscribe->get());
+
+        $packet = Parser::parse($expected);
+
+        $this->assertInstanceOf('Drmer\Mqtt\Packet\Subscribe', $packet);
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+
+        $this->assertEquals(14, $packet->getIdentifier());
+    }
+
+    public function testSubscribeAck()
+    {
+        $ack = new SubscribeAck();
+        $ack->setIdentifier(15);
+
+        $expected = implode([
+            chr(144),
+            chr(2),
+            chr(0), chr(15),
+        ]);
+
+        $this->assertSerialisedPacketEquals($expected, $ack->get());
+
+        $packet = Parser::parse($expected);
+
+        $this->assertInstanceOf('Drmer\Mqtt\Packet\SubscribeAck', $packet);
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+
+        $this->assertEquals(15, $packet->getIdentifier());
+    }
+
+    public function testUnsubscribe()
+    {
+        $unsubscribe = new Unsubscribe();
+        $unsubscribe->setIdentifier(16);
+        $unsubscribe->removeSubscription('test');
+
+        $expected = implode([
+            chr(160),
+            chr(8),
+            chr(0), chr(16),
+            chr(0), chr(4),
+            'test',
+        ]);
+        $this->assertSerialisedPacketEquals($expected, $unsubscribe->get());
+
+        $packet = Parser::parse($expected);
+
+        $this->assertInstanceOf('Drmer\Mqtt\Packet\Unsubscribe', $packet);
+
+        $this->assertEquals(16, $packet->getIdentifier());
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
+
+    public function testUnsubscribeAck()
+    {
+        $ack = new UnsubscribeAck();
+        $ack->setIdentifier(17);
+
+        $expected = implode([
+            chr(176),
+            chr(2),
+            chr(0), chr(17),
+        ]);
+
+        $this->assertSerialisedPacketEquals($expected, $ack->get());
+
+        $packet = Parser::parse($expected);
+
+        $this->assertInstanceOf('Drmer\Mqtt\Packet\UnsubscribeAck', $packet);
+
+        $this->assertEquals(17, $packet->getIdentifier());
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
     }
 }
