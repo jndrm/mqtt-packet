@@ -60,16 +60,24 @@ class Connect extends ControlPacket {
             $this->willRetain = $options->willRetain;
             $this->keepAlive = $options->keepAlive;
         }
-        $this->buildPayload();
-    }
-
-    protected function buildPayload()
-    {
-        $this->addLengthPrefixedField($this->getClientId());
         if (!is_null($this->willTopic)) {
             if (is_null($this->willMessage)) {
                 $this->willMessage = '';
             }
+        }
+        if (is_null($this->clientId)) {
+            $this->clientId = substr(md5(microtime()), 0, 23);
+        }
+    }
+
+    public function getPayload()
+    {
+        if ($this->payload) {
+            // payload is alread built
+            return $this->payload;
+        }
+        $this->addLengthPrefixedField($this->getClientId());
+        if (!is_null($this->willTopic)) {
             $this->addLengthPrefixedField($this->willTopic);
             $this->addLengthPrefixedField($this->willMessage);
         }
@@ -79,6 +87,7 @@ class Connect extends ControlPacket {
         if (!empty($this->password)) {
             $this->addLengthPrefixedField($this->password);
         }
+        return $this->payload;
     }
 
     public function parse($rawInput)
@@ -185,10 +194,7 @@ class Connect extends ControlPacket {
      */
     public function getClientId()
     {
-        if (!is_null($this->clientId)) {
-            return $this->clientId;
-        }
-        return $this->clientId = substr(md5(microtime()), 0, 23);
+        return $this->clientId;
     }
 
     public function getWillTopic()
