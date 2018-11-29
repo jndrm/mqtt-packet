@@ -118,6 +118,15 @@ class ConnectionOptions
     public function __construct(array $options = [])
     {
         $this->populate($options);
+
+        if (!is_null($this->willTopic)) {
+            if (is_null($this->willMessage)) {
+                $this->willMessage = '';
+            }
+        }
+        if (is_null($this->clientId)) {
+            $this->clientId = substr(md5(microtime()), 0, 23);
+        }
     }
 
     /**
