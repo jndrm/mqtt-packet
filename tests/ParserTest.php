@@ -10,6 +10,9 @@ use Drmer\Mqtt\Packet\PingRequest;
 use Drmer\Mqtt\Packet\PingResponse;
 use Drmer\Mqtt\Packet\Publish;
 use Drmer\Mqtt\Packet\PublishAck;
+use Drmer\Mqtt\Packet\PublishComplete;
+use Drmer\Mqtt\Packet\PublishReceived;
+use Drmer\Mqtt\Packet\PublishRelease;
 
 class ParserTest extends TestCase {
     public function testConnect()
@@ -121,5 +124,71 @@ class ParserTest extends TestCase {
 
         $this->assertInstanceOf('Drmer\Mqtt\Packet\PublishAck', $packet);
         $this->assertSerialisedPacketEquals($publishAck->get(), $packet->get());
+    }
+
+    public function testPublishComplete()
+    {
+        $complete = new PublishComplete();
+        $complete->setIdentifier(11);
+
+        $expected = implode([
+            chr(112),
+            chr(2),
+            chr(0), chr(11),
+        ]);
+
+        $this->assertSerialisedPacketEquals($expected, $complete->get());
+
+        $packet = Parser::parse($expected);
+
+        $this->assertInstanceOf('Drmer\Mqtt\Packet\PublishComplete', $packet);
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+
+        $this->assertEquals(11, $packet->getIdentifier());
+    }
+
+    public function testPublishReceive()
+    {
+        $received = new PublishReceived();
+        $received->setIdentifier(12);
+
+        $expected = implode([
+            chr(80),
+            chr(2),
+            chr(0), chr(12),
+        ]);
+
+        $this->assertSerialisedPacketEquals($expected, $received->get());
+
+        $packet = Parser::parse($expected);
+
+        $this->assertInstanceOf('Drmer\Mqtt\Packet\PublishReceived', $packet);
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+
+        $this->assertEquals(12, $packet->getIdentifier());
+    }
+
+    public function testPublishRelease()
+    {
+        $received = new PublishRelease();
+        $received->setIdentifier(13);
+
+        $expected = implode([
+            chr(98),
+            chr(2),
+            chr(0), chr(13),
+        ]);
+
+        $this->assertSerialisedPacketEquals($expected, $received->get());
+
+        $packet = Parser::parse($expected);
+
+        $this->assertInstanceOf('Drmer\Mqtt\Packet\PublishRelease', $packet);
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+
+        $this->assertEquals(13, $packet->getIdentifier());
     }
 }
