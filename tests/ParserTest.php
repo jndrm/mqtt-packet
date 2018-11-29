@@ -259,7 +259,7 @@ class ParserTest extends TestCase {
         $this->assertSerialisedPacketEquals($expected, $packet->get());
     }
 
-    public function testTetCmd()
+    public function testGetCmd()
     {
         $this->assertEquals('connect', Parser::getCmd(ControlPacketType::CONNECT));
 
