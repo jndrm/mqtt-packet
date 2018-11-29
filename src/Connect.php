@@ -81,6 +81,40 @@ class Connect extends ControlPacket {
         }
     }
 
+    public function parse($rawInput)
+    {
+        parent::parse($rawInput);
+
+        // clean payload
+        $this->payload = '';
+
+        $body = substr($rawInput, 2);
+        $protocol = static::readString($body);
+
+        $this->cleanSession = ord($body[1]) >> 1 & 0x1;
+        $hasWill = ord($body[1]) >> 2 & 0x1;
+        $this->willQos = ord($body[1]) >> 3 & 0x3;
+        $this->willRetain = ord($body[1]) >> 5 & 0x1;
+        $hasPassword  = ord($body[1]) >> 6 & 0x1;
+        $hasUsername  = ord($body[1]) >> 7 & 0x1;
+
+        $body = substr($body, 2);
+        $this->keepAlive = static::readShortInt($body);
+
+        $this->clientId = static::readString($body);
+        $this->addLengthPrefixedField($this->clientId);
+        if ($hasWill) {
+            $this->willTopic = static::readString($body);
+            $this->willMessage = static::readString($body);
+        }
+        if ($hasUsername) {
+            $this->username = static::readString($body);
+        }
+        if ($hasPassword) {
+            $this->password = static::readString($body);
+        }
+    }
+
     /**
      * @return int
      */
@@ -150,9 +184,9 @@ class Connect extends ControlPacket {
      */
     public function getClientId()
     {
-        if (is_null($this->clientId)) {
-            $this->clientId = md5(microtime());
+        if (!is_null($this->clientId)) {
+            return $this->clientId;
         }
-        return substr($this->clientId, 0, 23);
+        return $this->clientId = substr(md5(microtime()), 0, 23);
     }
 }

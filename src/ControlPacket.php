@@ -4,6 +4,7 @@ namespace Drmer\Mqtt\Packet;
 
 use Drmer\Mqtt\Packet\Protocol\Version;
 use Drmer\Mqtt\Packet\Protocol\Version4;
+use Drmer\Mqtt\Packet\Utils\MessageHelper;
 
 abstract class ControlPacket {
 
@@ -160,5 +161,35 @@ abstract class ControlPacket {
         $lengthOfMessage = ord($header{1});
 
         return substr($rawInput, $startIndex + $headerLength, $lengthOfMessage);
+    }
+
+    /**
+     * Read string from buffer.
+     * @param $buffer
+     * @return string
+     * @see https://github.com/walkor/mqtt/blob/master/src/Protocols/Mqtt.php#readString
+     */
+    public static function readString(&$buffer) {
+        $tmp = unpack('n', $buffer);
+        $length = array_pop($tmp);
+        if ($length + 2 > strlen($buffer)) {
+            throw new \RuntimeException("buffer:".bin2hex($buffer)." lenth:$length not enough for unpackString");
+        }
+
+        $string = substr($buffer, 2, $length);
+        $buffer = substr($buffer, $length + 2);
+        return $string;
+    }
+
+    /**
+     * Read unsigned short int from buffer.
+     * @param $buffer
+     * @return mixed
+     * @see https://github.com/walkor/mqtt/blob/master/src/Protocols/Mqtt.php#readShortInt
+     */
+    public static function readShortInt(&$buffer) {
+        $tmp = unpack('n', $buffer);
+        $buffer = substr($buffer, 2);
+        return array_pop($tmp);
     }
 }
