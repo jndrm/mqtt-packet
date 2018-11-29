@@ -85,11 +85,11 @@ class ConnectionOptions
     /**
      * Will Quality of Service
      *
-     * @see \Drmer\Mqtt\Packet\QoS\Levels
+     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Table_3.11_-
      *
      * @var int
      */
-    public $willQos = Levels::AT_MOST_ONCE_DELIVERY;
+    public $willQos = 0;
 
     /**
      * Will Retain (flag)
