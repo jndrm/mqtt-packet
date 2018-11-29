@@ -65,11 +65,6 @@ abstract class ControlPacket {
         throw new \RuntimeException('you must overwrite getControlPacketType()');
     }
 
-    protected function getPayloadLength()
-    {
-        return strlen($this->getPayload());
-    }
-
     public function getPayload()
     {
         return $this->payload;
@@ -77,7 +72,7 @@ abstract class ControlPacket {
 
     protected function getRemainingLength()
     {
-        return strlen($this->getVariableHeader()) + $this->getPayloadLength();
+        return strlen($this->getVariableHeader()) + strlen($this->getPayload());
     }
 
     /**
