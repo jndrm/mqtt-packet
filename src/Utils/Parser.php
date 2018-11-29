@@ -23,52 +23,9 @@ use Drmer\Mqtt\Packet\Disconnect;
 final class Parser {
     public static function parse($rawInput, Version $version=null)
     {
-        $packet = null;
-        switch (ord($rawInput{0}) >> 4) {
-            case ControlPacketType::CONNECT:
-                $packet = new Connect();
-                break;
-            case ControlPacketType::CONNACK:
-                $packet = new ConnectionAck();
-                break;
-            case ControlPacketType::PUBLISH:
-                $packet = new Publish();
-                break;
-            case ControlPacketType::PUBACK:
-                $packet = new PublishAck();
-                break;
-            case ControlPacketType::PUBREC:
-                $packet = new PublishReceived();
-                break;
-            case ControlPacketType::PUBREL:
-                $packet = new PublishRelease();
-                break;
-            case ControlPacketType::PUBCOMP:
-                $packet = new PublishComplete();
-                break;
-            case ControlPacketType::SUBSCRIBE:
-                $packet = new Subscribe();
-                break;
-            case ControlPacketType::SUBACK:
-                $packet = new SubscribeAck();
-                break;
-            case ControlPacketType::UNSUBSCRIBE:
-                $packet = new Unsubscribe();
-                break;
-            case ControlPacketType::UNSUBACK:
-                $packet = new UnsubscribeAck();
-                break;
-            case ControlPacketType::PINGREQ:
-                $packet = new PingRequest();
-                break;
-            case ControlPacketType::PINGRESP:
-                $packet = new PingResponse();
-                break;
-            case ControlPacketType::DISCONNECT:
-                $packet = new Disconnect();
-                break;
-            default:
-                return null;
+        $packet = static::detectPacket(ord($rawInput{0}) >> 4);
+        if (null == $packet) {
+            return null;
         }
         if (null == $version) {
             $version = new Version4();
@@ -76,6 +33,42 @@ final class Parser {
         $packet->setVersion($version);
         $packet->parse($rawInput);
         return $packet;
+    }
+
+    private static function detectPacket($type)
+    {
+        switch ($type) {
+            case ControlPacketType::CONNECT:
+                return new Connect();
+            case ControlPacketType::CONNACK:
+                return new ConnectionAck();
+            case ControlPacketType::PUBLISH:
+                return new Publish();
+            case ControlPacketType::PUBACK:
+                return new PublishAck();
+            case ControlPacketType::PUBREC:
+                return new PublishReceived();
+            case ControlPacketType::PUBREL:
+                return new PublishRelease();
+            case ControlPacketType::PUBCOMP:
+                return new PublishComplete();
+            case ControlPacketType::SUBSCRIBE:
+                return new Subscribe();
+            case ControlPacketType::SUBACK:
+                return new SubscribeAck();
+            case ControlPacketType::UNSUBSCRIBE:
+                return new Unsubscribe();
+            case ControlPacketType::UNSUBACK:
+                return new UnsubscribeAck();
+            case ControlPacketType::PINGREQ:
+                return new PingRequest();
+            case ControlPacketType::PINGRESP:
+                return new PingResponse();
+            case ControlPacketType::DISCONNECT:
+                return new Disconnect();
+            default:
+                return null;
+        }
     }
 
     public static function getCmd($type)

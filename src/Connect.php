@@ -60,14 +60,6 @@ class Connect extends ControlPacket {
             $this->willRetain = $options->willRetain;
             $this->keepAlive = $options->keepAlive;
         }
-        if (!is_null($this->willTopic)) {
-            if (is_null($this->willMessage)) {
-                $this->willMessage = '';
-            }
-        }
-        if (is_null($this->clientId)) {
-            $this->clientId = substr(md5(microtime()), 0, 23);
-        }
     }
 
     public function getPayload()
@@ -94,8 +86,10 @@ class Connect extends ControlPacket {
     {
         parent::parse($rawInput);
 
-        $body = substr($rawInput, 2);
-        $protocol = static::readString($body);
+        // 2: fixed header
+        // 2: MQTT length field chr(0), chr(4)
+        // 4: MQTT
+        $body = substr($rawInput, 2 + 2 + 4);
 
         $this->cleanSession = ord($body[1]) >> 1 & 0x1;
         $hasWill = ord($body[1]) >> 2 & 0x1;
@@ -107,21 +101,16 @@ class Connect extends ControlPacket {
         $body = substr($body, 2);
         $this->keepAlive = static::readShortInt($body);
 
-        $this->clientId = static::readString($body);
-        $this->addLengthPrefixedField($this->clientId);
+        $this->addLengthPrefixedField($this->clientId = static::readString($body));
         if ($hasWill) {
-            $this->willTopic = static::readString($body);
-            $this->addLengthPrefixedField($this->willTopic);
-            $this->willMessage = static::readString($body);
-            $this->addLengthPrefixedField($this->willMessage);
+            $this->addLengthPrefixedField($this->willTopic = static::readString($body));
+            $this->addLengthPrefixedField($this->willMessage = static::readString($body));
         }
         if ($hasUsername) {
-            $this->username = static::readString($body);
-            $this->addLengthPrefixedField($this->username);
+            $this->addLengthPrefixedField($this->username = static::readString($body));
         }
         if ($hasPassword) {
-            $this->password = static::readString($body);
-            $this->addLengthPrefixedField($this->password);
+            $this->addLengthPrefixedField($this->password = static::readString($body));
         }
     }
 
