@@ -181,6 +181,12 @@ abstract class ControlPacket {
         return $string;
     }
 
+    public function debugPrint()
+    {
+        echo "\n";
+        echo MessageHelper::getReadableByRawString($this->get());
+    }
+
     /**
      * Read unsigned short int from buffer.
      * @param $buffer
