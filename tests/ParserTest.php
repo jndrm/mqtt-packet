@@ -8,6 +8,7 @@ use Drmer\Mqtt\Packet\ConnectionAck;
 use Drmer\Mqtt\Packet\Disconnect;
 use Drmer\Mqtt\Packet\PingRequest;
 use Drmer\Mqtt\Packet\PingResponse;
+use Drmer\Mqtt\Packet\Publish;
 use Drmer\Mqtt\Packet\PublishAck;
 
 class ParserTest extends TestCase {
@@ -84,6 +85,33 @@ class ParserTest extends TestCase {
         $this->assertInstanceOf('Drmer\Mqtt\Packet\PingResponse', $packet);
 
         $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
+
+    public function testPublish()
+    {
+        $publish = new Publish();
+        $publish->setIdentifier(10);
+        $publish->setTopic('test');
+        $publish->setPayload('hello');
+
+        $expected = implode([
+            chr(48),
+            chr(11),
+            chr(0), chr(4),
+            'test',
+            'hello',
+        ]);
+
+        $this->assertSerialisedPacketEquals($expected, $publish->get());
+
+        $packet = Parser::parse($expected);
+
+        $this->assertInstanceOf('Drmer\Mqtt\Packet\Publish', $packet);
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+
+        $this->assertEquals('test', $packet->getTopic());
+        $this->assertEquals('hello', $packet->getPayload());
     }
 
     public function testPublishAck()

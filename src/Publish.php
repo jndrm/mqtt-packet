@@ -105,6 +105,11 @@ class Publish extends ControlPacket
         return $this->qos;
     }
 
+    public function setPayload($message)
+    {
+        $this->payload = $message;
+    }
+
     /**
      * @return string
      */
