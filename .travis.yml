@@ -13,11 +13,11 @@ php:
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
-  - if [ $(phpenv version-name) = "7.2" ]; then ./cc-test-reporter before-build; fi
+  - ./cc-test-reporter before-build
 
 script:
   - composer install
   - php vendor/bin/phpunit
 
 after_script:
-  - if [ $(phpenv version-name) = "7.2" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
