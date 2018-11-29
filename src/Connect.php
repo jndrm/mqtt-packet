@@ -105,13 +105,17 @@ class Connect extends ControlPacket {
         $this->addLengthPrefixedField($this->clientId);
         if ($hasWill) {
             $this->willTopic = static::readString($body);
+            $this->addLengthPrefixedField($this->willTopic);
             $this->willMessage = static::readString($body);
+            $this->addLengthPrefixedField($this->willMessage);
         }
         if ($hasUsername) {
             $this->username = static::readString($body);
+            $this->addLengthPrefixedField($this->username);
         }
         if ($hasPassword) {
             $this->password = static::readString($body);
+            $this->addLengthPrefixedField($this->password);
         }
     }
 
@@ -188,5 +192,15 @@ class Connect extends ControlPacket {
             return $this->clientId;
         }
         return $this->clientId = substr(md5(microtime()), 0, 23);
+    }
+
+    public function getWillTopic()
+    {
+        return $this->willTopic;
+    }
+
+    public function getWillQos()
+    {
+        return $this->willQos;
     }
 }

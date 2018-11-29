@@ -283,4 +283,28 @@ class ConnectTest extends TestCase {
         ]);
         $this->assertSerialisedPacketEquals($expected, $packet->get());
     }
+
+    public function testParse()
+    {
+        $expected = implode([
+            chr(16),
+            chr(20),
+            chr(0), chr(4),
+            'MQTT',
+            chr(4),
+            chr(22),
+            chr(0), chr(0), chr(0), chr(0),
+            chr(0), chr(4),
+            'test',
+            chr(0), chr(0),
+        ]);
+        $packet = new Connect();
+        $packet->parse($expected);
+
+        $this->assertEquals('', $packet->getClientId());
+        $this->assertEquals('test', $packet->getWillTopic());
+        $this->assertEquals(2, $packet->getWillQos());
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
 }
