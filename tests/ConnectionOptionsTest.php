@@ -44,7 +44,7 @@ class ConnectionOptionsTest extends TestCase
             'cleanSession'  =>  false,
             'willTopic'     =>  'lost/',
             'willMessage'   =>  'John has left...',
-            'willQos'       =>  Levels::EXACTLY_ONCE_DELIVERY,
+            'willQos'       =>  2,
             'willRetain'    =>  true
         ];
 
