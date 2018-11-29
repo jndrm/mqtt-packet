@@ -40,4 +40,22 @@ class SubscribeTest extends TestCase {
             MessageHelper::getReadableByRawString(chr(130) . chr(14))
         );
     }
+
+    public function testParse()
+    {
+        $expected = implode([
+            chr(130),
+            chr(9),
+            chr(0), chr(14),
+            chr(0), chr(4),
+            'test',
+            chr(2),
+        ]);
+
+        $packet = new Subscribe();
+        $packet->parse($expected);
+
+        $this->assertEquals(14, $packet->getIdentifier());
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
 }

@@ -13,4 +13,19 @@ class PublishReceivedTest extends TestCase {
             5
         );
     }
+
+    public function testParse()
+    {
+        $expected = implode([
+            chr(80),
+            chr(2),
+            chr(0), chr(12),
+        ]);
+
+        $packet = new PublishReceived();
+        $packet->parse($expected);
+
+        $this->assertEquals(12, $packet->getIdentifier());
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
 }

@@ -21,31 +21,45 @@ use Drmer\Mqtt\Packet\UnsubscribeAck;
 class ParserTest extends TestCase {
     public function testConnect()
     {
-        $connect = new Connect([
-            'clientId' => 'abc',
+        $expected = implode([
+            chr(16),
+            chr(20),
+            chr(0), chr(4),
+            'MQTT',
+            chr(4),
+            chr(22),
+            chr(0), chr(0), chr(0), chr(0),
+            chr(0), chr(4),
+            'test',
+            chr(0), chr(0),
         ]);
-        $packet = Parser::parse($connect->get());
+
+        $packet = Parser::parse($expected);
 
         $this->assertInstanceOf('Drmer\Mqtt\Packet\Connect', $packet);
 
-        $this->assertSerialisedPacketEquals($connect->get(), $packet->get());
+        $this->assertEquals('test', $packet->getWillTopic());
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
     }
 
     public function testConnectAck()
     {
-        $conAck = new ConnectionAck();
-        $conAck->setIdentifier(10);
-        $packet = Parser::parse($conAck->get());
+        $expected = implode([
+            chr(32),
+            chr(2),
+            chr(0), chr(5),
+        ]);
+
+        $packet = Parser::parse($expected);
 
         $this->assertInstanceOf('Drmer\Mqtt\Packet\ConnectionAck', $packet);
 
-        $this->assertSerialisedPacketEquals($conAck->get(), $packet->get());
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
     }
 
     public function testDisconnect()
     {
-        $disconnect = new Disconnect();
-
         $expected = implode([
             chr(224),
             chr(0),
@@ -60,14 +74,10 @@ class ParserTest extends TestCase {
 
     public function testPingRequest()
     {
-        $ping = new PingRequest();
-
         $expected = implode([
             chr(192),
             chr(0),
         ]);
-
-        $this->assertSerialisedPacketEquals($expected, $ping->get());
 
         $packet = Parser::parse($expected);
 
@@ -78,14 +88,10 @@ class ParserTest extends TestCase {
 
     public function testPingResponse()
     {
-        $pong = new PingResponse();
-
         $expected = implode([
             chr(208),
             chr(0),
         ]);
-
-        $this->assertSerialisedPacketEquals($expected, $pong->get());
 
         $packet = Parser::parse($expected);
 
@@ -96,11 +102,6 @@ class ParserTest extends TestCase {
 
     public function testPublish()
     {
-        $publish = new Publish();
-        $publish->setIdentifier(10);
-        $publish->setTopic('test');
-        $publish->setPayload('hello');
-
         $expected = implode([
             chr(48),
             chr(11),
@@ -108,8 +109,6 @@ class ParserTest extends TestCase {
             'test',
             'hello',
         ]);
-
-        $this->assertSerialisedPacketEquals($expected, $publish->get());
 
         $packet = Parser::parse($expected);
 
@@ -123,25 +122,26 @@ class ParserTest extends TestCase {
 
     public function testPublishAck()
     {
-        $publishAck = new PublishAck();
-        $packet = Parser::parse($publishAck->get());
+        $expected = implode([
+            chr(64),
+            chr(2),
+            chr(0),
+            chr(12),
+        ]);
+
+        $packet = Parser::parse($expected);
 
         $this->assertInstanceOf('Drmer\Mqtt\Packet\PublishAck', $packet);
-        $this->assertSerialisedPacketEquals($publishAck->get(), $packet->get());
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
     }
 
     public function testPublishComplete()
     {
-        $complete = new PublishComplete();
-        $complete->setIdentifier(11);
-
         $expected = implode([
             chr(112),
             chr(2),
             chr(0), chr(11),
         ]);
-
-        $this->assertSerialisedPacketEquals($expected, $complete->get());
 
         $packet = Parser::parse($expected);
 
@@ -154,16 +154,11 @@ class ParserTest extends TestCase {
 
     public function testPublishReceive()
     {
-        $received = new PublishReceived();
-        $received->setIdentifier(12);
-
         $expected = implode([
             chr(80),
             chr(2),
             chr(0), chr(12),
         ]);
-
-        $this->assertSerialisedPacketEquals($expected, $received->get());
 
         $packet = Parser::parse($expected);
 
@@ -176,16 +171,11 @@ class ParserTest extends TestCase {
 
     public function testPublishRelease()
     {
-        $publishRelease = new PublishRelease();
-        $publishRelease->setIdentifier(13);
-
         $expected = implode([
             chr(98),
             chr(2),
             chr(0), chr(13),
         ]);
-
-        $this->assertSerialisedPacketEquals($expected, $publishRelease->get());
 
         $packet = Parser::parse($expected);
 
@@ -198,10 +188,6 @@ class ParserTest extends TestCase {
 
     public function testSubscribe()
     {
-        $subscribe = new Subscribe();
-        $subscribe->setIdentifier(14);
-        $subscribe->addSubscription('test', 2);
-
         $expected = implode([
             chr(130),
             chr(9),
@@ -210,8 +196,6 @@ class ParserTest extends TestCase {
             'test',
             chr(2),
         ]);
-
-        $this->assertSerialisedPacketEquals($expected, $subscribe->get());
 
         $packet = Parser::parse($expected);
 
@@ -224,16 +208,11 @@ class ParserTest extends TestCase {
 
     public function testSubscribeAck()
     {
-        $ack = new SubscribeAck();
-        $ack->setIdentifier(15);
-
         $expected = implode([
             chr(144),
             chr(2),
             chr(0), chr(15),
         ]);
-
-        $this->assertSerialisedPacketEquals($expected, $ack->get());
 
         $packet = Parser::parse($expected);
 
@@ -246,10 +225,6 @@ class ParserTest extends TestCase {
 
     public function testUnsubscribe()
     {
-        $unsubscribe = new Unsubscribe();
-        $unsubscribe->setIdentifier(16);
-        $unsubscribe->removeSubscription('test');
-
         $expected = implode([
             chr(160),
             chr(8),
@@ -257,8 +232,6 @@ class ParserTest extends TestCase {
             chr(0), chr(4),
             'test',
         ]);
-        $this->assertSerialisedPacketEquals($expected, $unsubscribe->get());
-
         $packet = Parser::parse($expected);
 
         $this->assertInstanceOf('Drmer\Mqtt\Packet\Unsubscribe', $packet);
@@ -270,16 +243,11 @@ class ParserTest extends TestCase {
 
     public function testUnsubscribeAck()
     {
-        $ack = new UnsubscribeAck();
-        $ack->setIdentifier(17);
-
         $expected = implode([
             chr(176),
             chr(2),
             chr(0), chr(17),
         ]);
-
-        $this->assertSerialisedPacketEquals($expected, $ack->get());
 
         $packet = Parser::parse($expected);
 

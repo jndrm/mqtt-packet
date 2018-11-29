@@ -25,4 +25,18 @@ class SubscribeAckTest extends TestCase {
         );
     }
 
+    public function testParse()
+    {
+        $expected = implode([
+            chr(144),
+            chr(2),
+            chr(0), chr(15),
+        ]);
+
+        $packet = new SubscribeAck();
+        $packet->parse($expected);
+
+        $this->assertEquals(15, $packet->getIdentifier());
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
 }

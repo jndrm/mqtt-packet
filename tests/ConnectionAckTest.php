@@ -13,4 +13,19 @@ class ConnectionAckTest extends TestCase
 
         $this->assertEquals(2, $packetType);
     }
+
+    public function testParse()
+    {
+        $expected = implode([
+            chr(32),
+            chr(2),
+            chr(0), chr(5),
+        ]);
+
+        $packet = new ConnectionAck();
+        $packet->parse($expected);
+
+        $this->assertEquals(5, $packet->getIdentifier());
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
 }

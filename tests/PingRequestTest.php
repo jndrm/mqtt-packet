@@ -21,4 +21,16 @@ class PingRequestTest extends TestCase {
             chr(12 << 4) . chr(0)
         );
     }
+
+    public function testParse()
+    {
+        $expected = implode([
+            chr(192),
+            chr(0),
+        ]);
+        $ping = new PingRequest();
+        $ping->parse($expected);
+
+        $this->assertSerialisedPacketEquals($expected, $ping->get());
+    }
 }
