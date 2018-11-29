@@ -30,7 +30,7 @@ abstract class ControlPacket {
         $this->version = $version;
     }
 
-    public function setIdentifier($identifier)
+    public function setIdentifier(int $identifier)
     {
         $this->identifier = $identifier;
         return $this;
