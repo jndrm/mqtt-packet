@@ -14,35 +14,18 @@ class ConnectionAckTest extends TestCase
         $this->assertEquals(2, $packetType);
     }
 
-    public function testExceptionIsThrownForUnexpectedPacketType()
+    public function testParse()
     {
-        $input =
-            chr(0b10101010) .
-            chr(2) .
-            chr(0) .
-            chr(0);
+        $expected = implode([
+            chr(32),
+            chr(2),
+            chr(0), chr(5),
+        ]);
 
-        $this->expectException(
-            'RuntimeException',
-            'raw input is not valid for this control packet'
-        );
+        $packet = new ConnectionAck();
+        $packet->parse($expected);
 
-        ConnectionAck::parse(new Version4(), $input);
-    }
-
-    public function testPacketCanBeParsed()
-    {
-        $version = new Version4();
-        $expectedPacket = new ConnectionAck($version);
-
-        $input =
-            chr(0b00100000) .
-            chr(2) .
-            chr(0) .
-            chr(0);
-
-        $parsedPacket = ConnectionAck::parse($version, $input);
-
-        $this->assertEquals($expectedPacket, $parsedPacket);
+        $this->assertEquals(5, $packet->getIdentifier());
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
     }
 }

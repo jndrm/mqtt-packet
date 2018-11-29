@@ -9,8 +9,7 @@ class SubscribeAckTest extends TestCase {
 
     public function testGetControlPacketType()
     {
-        $version = new Version4();
-        $packet = new SubscribeAck($version);
+        $packet = new SubscribeAck();
         $this->assertEquals(
             SubscribeAck::getControlPacketType(),
             9
@@ -19,12 +18,25 @@ class SubscribeAckTest extends TestCase {
 
     public function testGetHeaderTestFixedHeader()
     {
-        $version = new Version4();
-        $packet = new SubscribeAck($version);
+        $packet = new SubscribeAck();
         $this->assertEquals(
             substr($packet->get(), 0, 2),
             chr(9 << 4) . chr(0)
         );
     }
 
+    public function testParse()
+    {
+        $expected = implode([
+            chr(144),
+            chr(2),
+            chr(0), chr(15),
+        ]);
+
+        $packet = new SubscribeAck();
+        $packet->parse($expected);
+
+        $this->assertEquals(15, $packet->getIdentifier());
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
 }

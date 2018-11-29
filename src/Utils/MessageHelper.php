@@ -1,6 +1,6 @@
 <?php
 
-namespace Drmer\Mqtt\Packet;
+namespace Drmer\Mqtt\Packet\Utils;
 
 class MessageHelper {
 

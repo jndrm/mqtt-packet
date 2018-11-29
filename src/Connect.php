@@ -3,6 +3,7 @@
 namespace Drmer\Mqtt\Packet;
 
 use Drmer\Mqtt\Packet\Protocol\Version;
+use Drmer\Mqtt\Packet\Protocol\Version4;
 
 /**
  * After a Network Connection is established by a Client to a Server, the
@@ -28,7 +29,7 @@ class Connect extends ControlPacket {
     /** @var string|null  */
     protected $willMessage;
 
-    /** @var bool|null  */
+    /** @var int  */
     protected $willQos;
 
     /** @var null */
@@ -39,45 +40,44 @@ class Connect extends ControlPacket {
 
     /**
      * @param Version $version
-     * @param string|null $username
-     * @param string|null $password
-     * @param string|null $clientId
-     * @param bool $cleanSession
-     * @param string|null $willTopic
-     * @param string|null $willMessage
-     * @param bool|null $willQos
-     * @param null $willRetain
-     * @param int $keepAlive
+     * @param ConnectionOptions|Array|null $opts
      */
-    public function __construct(
-        Version $version,
-        $username = null,
-        $password = null,
-        $clientId = null,
-        $cleanSession = true,
-        $willTopic = null,
-        $willMessage = null,
-        $willQos = null,
-        $willRetain = null,
-        $keepAlive = 0
-    ) {
-        parent::__construct($version);
-        $this->clientId = $clientId;
-        $this->username = $username;
-        $this->password = $password;
-        $this->cleanSession = boolval($cleanSession);
-        $this->willTopic = $willTopic;
-        $this->willMessage = $willMessage;
-        $this->willQos = boolval($willQos);
-        $this->willRetain = $willRetain;
-        $this->keepAlive = $keepAlive;
-        $this->buildPayload();
+    public function __construct($opts=null)
+    {
+        parent::__construct();
+        $options = $opts;
+        if (is_array($opts)) {
+            $options = new ConnectionOptions($opts);
+        }
+        if ($options) {
+            $this->clientId = $options->clientId;
+            $this->username = $options->username;
+            $this->password = $options->password;
+            $this->cleanSession = boolval($options->cleanSession);
+            $this->willTopic = $options->willTopic;
+            $this->willMessage = $options->willMessage;
+            $this->willQos = $options->willQos;
+            $this->willRetain = $options->willRetain;
+            $this->keepAlive = $options->keepAlive;
+        }
+        if (!is_null($this->willTopic)) {
+            if (is_null($this->willMessage)) {
+                $this->willMessage = '';
+            }
+        }
+        if (is_null($this->clientId)) {
+            $this->clientId = substr(md5(microtime()), 0, 23);
+        }
     }
 
-    protected function buildPayload()
+    public function getPayload()
     {
+        if ($this->payload) {
+            // payload is alread built
+            return $this->payload;
+        }
         $this->addLengthPrefixedField($this->getClientId());
-        if (!is_null($this->willTopic) && !is_null($this->willMessage)) {
+        if (!is_null($this->willTopic)) {
             $this->addLengthPrefixedField($this->willTopic);
             $this->addLengthPrefixedField($this->willMessage);
         }
@@ -85,6 +85,42 @@ class Connect extends ControlPacket {
             $this->addLengthPrefixedField($this->username);
         }
         if (!empty($this->password)) {
+            $this->addLengthPrefixedField($this->password);
+        }
+        return $this->payload;
+    }
+
+    public function parse($rawInput)
+    {
+        parent::parse($rawInput);
+
+        $body = substr($rawInput, 2);
+        $protocol = static::readString($body);
+
+        $this->cleanSession = ord($body[1]) >> 1 & 0x1;
+        $hasWill = ord($body[1]) >> 2 & 0x1;
+        $this->willQos = ord($body[1]) >> 3 & 0x3;
+        $this->willRetain = ord($body[1]) >> 5 & 0x1;
+        $hasPassword  = ord($body[1]) >> 6 & 0x1;
+        $hasUsername  = ord($body[1]) >> 7 & 0x1;
+
+        $body = substr($body, 2);
+        $this->keepAlive = static::readShortInt($body);
+
+        $this->clientId = static::readString($body);
+        $this->addLengthPrefixedField($this->clientId);
+        if ($hasWill) {
+            $this->willTopic = static::readString($body);
+            $this->addLengthPrefixedField($this->willTopic);
+            $this->willMessage = static::readString($body);
+            $this->addLengthPrefixedField($this->willMessage);
+        }
+        if ($hasUsername) {
+            $this->username = static::readString($body);
+            $this->addLengthPrefixedField($this->username);
+        }
+        if ($hasPassword) {
+            $this->password = static::readString($body);
             $this->addLengthPrefixedField($this->password);
         }
     }
@@ -136,8 +172,7 @@ class Connect extends ControlPacket {
         }
 
         if ($this->willQos) {
-            $connectByte += 1 << 3;
-            // 4 TODO ?
+            $connectByte += $this->willQos << 3;
         }
 
         if ($this->willRetain) {
@@ -159,9 +194,16 @@ class Connect extends ControlPacket {
      */
     public function getClientId()
     {
-        if (is_null($this->clientId)) {
-            $this->clientId = md5(microtime());
-        }
-        return substr($this->clientId, 0, 23);
+        return $this->clientId;
+    }
+
+    public function getWillTopic()
+    {
+        return $this->willTopic;
+    }
+
+    public function getWillQos()
+    {
+        return $this->willQos;
     }
 }

@@ -8,8 +8,6 @@ namespace Drmer\Mqtt\Packet;
  */
 class UnsubscribeAck extends ControlPacket
 {
-    const EVENT = 'UNSUBSCRIBE_ACK';
-
     public static function getControlPacketType()
     {
         return ControlPacketType::UNSUBACK;

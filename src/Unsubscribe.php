@@ -20,4 +20,12 @@ class Unsubscribe extends ControlPacket {
     {
         $this->payload .= $this->getLengthPrefixField($topic);
     }
+
+    public function parse($rawInput)
+    {
+        parent::parse($rawInput);
+        $body = substr($rawInput, 4);
+        $topic = static::readString($body);
+        $this->removeSubscription($topic);
+    }
 }

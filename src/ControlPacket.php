@@ -3,8 +3,15 @@
 namespace Drmer\Mqtt\Packet;
 
 use Drmer\Mqtt\Packet\Protocol\Version;
+use Drmer\Mqtt\Packet\Protocol\Version4;
+use Drmer\Mqtt\Packet\Utils\MessageHelper;
 
 abstract class ControlPacket {
+
+    // packet identifer index
+    // set this to -1 if subclass need to
+    // proccess identifier itself.
+    const ID_INDEX = 2;
 
     /** @var $version Version */
     protected $version;
@@ -13,33 +20,48 @@ abstract class ControlPacket {
 
     protected $identifier;
 
-    public function __construct(Version $version)
+    public function __construct()
+    {
+        $this->version = new Version4();
+    }
+
+    public function setVersion(Version $version)
     {
         $this->version = $version;
     }
 
-    /**
-     * @param Version $version
-     * @param string $rawInput
-     * @return static
-     */
-    public static function parse(Version $version, $rawInput)
+    public function setIdentifier(int $identifier)
     {
-        static::checkRawInputValidControlPackageType($rawInput);
-
-        return new static($version);
+        $this->identifier = $identifier;
+        return $this;
     }
 
-    protected static function checkRawInputValidControlPackageType($rawInput)
+    public function getIdentifier()
     {
-        $packetType = ord($rawInput{0}) >> 4;
-        if ($packetType !== static::getControlPacketType()) {
-            throw new \RuntimeException('raw input is not valid for this control packet');
+        return $this->identifier;
+    }
+
+    public function parse($rawInput)
+    {
+        // before parsing we need to clean payload
+        $this->payload = '';
+        if (static::ID_INDEX > 0) {
+            $this->identifier = $this->parseIdentifier($rawInput, static::ID_INDEX);
         }
     }
 
+    public function parseIdentifier($rawInput, $startIndex)
+    {
+        if (strlen($rawInput) < $startIndex + 2) {
+            return null;
+        }
+        $identifier = unpack('n', substr($rawInput, $startIndex, 2));
+        return array_pop($identifier);
+    }
+
     /** @return int */
-    public static function getControlPacketType() {
+    public static function getControlPacketType()
+    {
         throw new \RuntimeException('you must overwrite getControlPacketType()');
     }
 
@@ -78,7 +100,10 @@ abstract class ControlPacket {
      */
     protected function getVariableHeader()
     {
-        return '';
+        if (is_null($this->identifier)) {
+            return '';
+        }
+        return pack('n', $this->identifier);
     }
 
     /**
@@ -138,5 +163,41 @@ abstract class ControlPacket {
         $lengthOfMessage = ord($header{1});
 
         return substr($rawInput, $startIndex + $headerLength, $lengthOfMessage);
+    }
+
+    /**
+     * Read string from buffer.
+     * @param $buffer
+     * @return string
+     * @see https://github.com/walkor/mqtt/blob/master/src/Protocols/Mqtt.php#readString
+     */
+    public static function readString(&$buffer) {
+        $tmp = unpack('n', $buffer);
+        $length = array_pop($tmp);
+        if ($length + 2 > strlen($buffer)) {
+            throw new \RuntimeException("buffer:".bin2hex($buffer)." lenth:$length not enough for unpackString");
+        }
+
+        $string = substr($buffer, 2, $length);
+        $buffer = substr($buffer, $length + 2);
+        return $string;
+    }
+
+    public function debugPrint()
+    {
+        echo "\n";
+        echo MessageHelper::getReadableByRawString($this->get());
+    }
+
+    /**
+     * Read unsigned short int from buffer.
+     * @param $buffer
+     * @return mixed
+     * @see https://github.com/walkor/mqtt/blob/master/src/Protocols/Mqtt.php#readShortInt
+     */
+    public static function readShortInt(&$buffer) {
+        $tmp = unpack('n', $buffer);
+        $buffer = substr($buffer, 2);
+        return array_pop($tmp);
     }
 }

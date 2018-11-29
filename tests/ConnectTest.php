@@ -4,7 +4,7 @@ namespace Drmer\Tests\Mqtt\Packet;
 
 use Drmer\Mqtt\Packet\Protocol\Version4;
 use Drmer\Mqtt\Packet\Connect;
-use Drmer\Mqtt\Packet\MessageHelper;
+use Drmer\Mqtt\Packet\Utils\MessageHelper;
 
 class ConnectTest extends TestCase {
 
@@ -15,204 +15,222 @@ class ConnectTest extends TestCase {
 
     public function testGetHeaderTestFixedHeader()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect($version, null, null, 'clientid');
+        $packet = new Connect([
+            'clientId' => 'clientid',
+        ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(chr(1 << 4) . chr(20)),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 0, 2))
+        $this->assertSerialisedPacketEquals(
+            chr(1 << 4) . chr(20),
+            substr($packet->get(), 0, 2)
         );
     }
 
     public function testGetHeaderTestVariableHeaderWithoutConnectFlags()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect($version, null, null, 'clientid', false);
-
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(0) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $packet = new Connect([
+            'clientid' => 'clientid',
+            'cleanSession' => false,
+        ]);
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(0),    // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagsCleanSession()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect($version);
+        $packet = new Connect();
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(2) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(2),    // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagWillFlag()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, null, null, 'clientId', false, 'willTopic', 'willMessage'
-        );
+        $packet = new Connect([
+            'clientId' => 'clientId',
+            'cleanSession' => false,
+            'willTopic' => 'willTopic',
+            'willMessage' => 'willMessage',
+        ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(4) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(4),    // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagWillRetain()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, null, null, 'clientId', false, null, null, null, true
-        );
+        $packet = new Connect([
+            'clientId' => 'clientId',
+            'cleanSession' => false,
+            'willRetain' => true,
+        ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(32) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(32),   // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagUsername()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, 'username', null, 'clientId', false, false, null, false
-        );
+        $packet = new Connect([
+            'username' => 'username',
+            'clientId' => 'clientId',
+            'cleanSession' => false,
+        ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(128) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(128),  // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagPassword()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, null, 'password', 'clientId', false, false, null, false
-        );
+        $packet = new Connect([
+            'password' => 'password',
+            'clientId' => 'clientId',
+            'cleanSession' => false,
+        ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(64) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(64),   // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagWillWillQos()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, null, null, 'clientId', false, null, null, true, null
-        );
+        $packet = new Connect([
+            'clientId' => 'clientId',
+            'cleanSession' => false,
+            'willQos' => true,
+        ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(8) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(8),    // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
     public function testGetHeaderTestVariableHeaderWithConnectFlagUserNamePasswordCleanSession()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect(
-            $version, 'username', 'password', 'clientId', true, false, null, false
-        );
+        $packet = new Connect([
+            'username' => 'username',
+            'password' => 'password',
+            'clientId' => 'clientId',
+        ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(194) .    // byte 8
-                chr(0) .    // byte 9
-                chr(0)      // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(194),  // byte 8
+            chr(0),    // byte 9
+            chr(0),    // byte 10
+        ]);
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
     public function testBytesNineAndTenOfVariableHeaderAreKeepAlive()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new \Drmer\Mqtt\Packet\Connect(
-            $version, null, null, null, true, null, null, null, null, 999
-        );
+        $packet = new Connect([
+            'keepAlive' => 999,
+        ]);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(
-                chr(0) .    // byte 1
-                chr(4) .    // byte 2
-                'MQTT' .    // byte 3,4,5,6
-                chr(4) .    // byte 7
-                chr(2) .    // byte 8
-                chr(3) .    // byte 9
-                chr(231)    // byte 10
-            ),
-            MessageHelper::getReadableByRawString(substr($packet->get(), 2, 10))
+        $expected = implode([
+            chr(0),    // byte 1
+            chr(4),    // byte 2
+            'MQTT',    // byte 3,4,5,6
+            chr(4),    // byte 7
+            chr(2),    // byte 8
+            chr(3),    // byte 9
+            chr(231),  // byte 10
+        ]);
+
+        $this->assertSerialisedPacketEquals(
+            $expected,
+            substr($packet->get(), 2, 10)
         );
     }
 
     public function testGetHeaderTestPayloadClientId()
     {
-        $version = new \Drmer\Mqtt\Packet\Protocol\Version4();
-        $packet = new Connect($version, null, null, 'clientid');
+        $packet = new Connect([
+            'clientId' => 'clientid',
+        ]);
 
         $this->assertEquals(
             substr($packet->get(), 12),
@@ -220,5 +238,73 @@ class ConnectTest extends TestCase {
             chr(8) .    // byte 2
             'clientid'
         );
+    }
+
+    public function testHeaderWithQos1()
+    {
+        $packet = new Connect([
+            'willTopic' => 'test',
+            'willQos' => 1,
+            'clientId' => '',
+        ]);
+        $expected = implode([
+            chr(16),
+            chr(20),
+            chr(0), chr(4),
+            'MQTT',
+            chr(4),
+            chr(14),
+            chr(0), chr(0), chr(0), chr(0),
+            chr(0), chr(4),
+            'test',
+            chr(0), chr(0),
+        ]);
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
+
+    public function testHeaderWithQos2()
+    {
+        $packet = new Connect([
+            'willTopic' => 'test',
+            'willQos' => 2,
+            'clientId' => '',
+        ]);
+        $expected = implode([
+            chr(16),
+            chr(20),
+            chr(0), chr(4),
+            'MQTT',
+            chr(4),
+            chr(22),
+            chr(0), chr(0), chr(0), chr(0),
+            chr(0), chr(4),
+            'test',
+            chr(0), chr(0),
+        ]);
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
+
+    public function testParse()
+    {
+        $expected = implode([
+            chr(16),
+            chr(20),
+            chr(0), chr(4),
+            'MQTT',
+            chr(4),
+            chr(22),
+            chr(0), chr(0), chr(0), chr(0),
+            chr(0), chr(4),
+            'test',
+            chr(0), chr(0),
+        ]);
+        $packet = new Connect();
+        $packet->parse($expected);
+
+        $this->assertEquals('', $packet->getClientId());
+        $this->assertEquals('test', $packet->getWillTopic());
+        $this->assertEquals(2, $packet->getWillQos());
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
     }
 }

@@ -14,12 +14,23 @@ class PingRequestTest extends TestCase {
 
     public function testGetHeaderTestFixedHeader()
     {
-        $version = new Version4();
-        $packet = new PingRequest($version);
+        $packet = new PingRequest();
 
         $this->assertEquals(
             substr($packet->get(), 0, 2),
             chr(12 << 4) . chr(0)
         );
+    }
+
+    public function testParse()
+    {
+        $expected = implode([
+            chr(192),
+            chr(0),
+        ]);
+        $ping = new PingRequest();
+        $ping->parse($expected);
+
+        $this->assertSerialisedPacketEquals($expected, $ping->get());
     }
 }

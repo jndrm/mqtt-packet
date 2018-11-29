@@ -10,6 +10,10 @@ class Subscribe extends ControlPacket {
 
     protected $topicFilters = array();
 
+    protected $topics = [];
+
+    protected $identifier = 0;
+
     public static function getControlPacketType()
     {
         return ControlPacketType::SUBSCRIBE;
@@ -21,22 +25,30 @@ class Subscribe extends ControlPacket {
     }
 
     /**
-     * @return string
-     */
-    protected function getVariableHeader()
-    {
-        return chr(0)
-             . chr(10)
-        ;
-    }
-
-    /**
      * @param string $topic
      * @param int $qos
      */
     public function addSubscription($topic, $qos = 0)
     {
-        $this->payload .= $this->getLengthPrefixField($topic);
-        $this->payload .= chr($qos);
+        $this->topics[$topic] = $qos;
+    }
+
+    public function getPayload()
+    {
+        $this->payload = '';
+        foreach ($this->topics as $topic => $qos) {
+            $this->payload .= $this->getLengthPrefixField($topic);
+            $this->payload .= chr($qos);
+        }
+        return $this->payload;
+    }
+
+    public function parse($rawInput)
+    {
+        parent::parse($rawInput);
+        $body = substr($rawInput, 4);
+        $topic = static::readString($body);
+        $qos = ord($body[0]) & 0x3;
+        $this->addSubscription($topic, $qos);
     }
 }

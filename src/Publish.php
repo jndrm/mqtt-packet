@@ -10,9 +10,7 @@ use Drmer\Mqtt\Packet\Protocol\Version;
  */
 class Publish extends ControlPacket
 {
-    const EVENT = 'PUBLISH';
-
-    protected $messageId;
+    const ID_INDEX = -1;
 
     protected $topic = '';
 
@@ -27,31 +25,28 @@ class Publish extends ControlPacket
         return ControlPacketType::PUBLISH;
     }
 
-    public static function parse(Version $version, $rawInput)
+    public function parse($rawInput)
     {
-        /** @var Publish $packet */
-        $packet = parent::parse($version, $rawInput);
-
-        //TODO 3.3.2.2 Packet Identifier not yet supported
+        parent::parse($rawInput);
         $topic = static::getPayloadLengthPrefixFieldInRawInput(2, $rawInput);
-        $packet->setTopic($topic);
+        $this->setTopic($topic);
 
         $byte1 = $rawInput{0};
         if (!empty($byte1)) {
-            $packet->setRetain(($byte1 & 1) === 1);
+            $this->setRetain(($byte1 & 1) === 1);
             if (($byte1 & 2) === 2) {
-                $packet->setQos(1);
+                $this->setQos(1);
             } elseif (($byte1 & 4) === 4) {
-                $packet->setQos(2);
+                $this->setQos(2);
             }
-            $packet->setDup(($byte1 & 8) === 8);
+            $this->setDup(($byte1 & 8) === 8);
         }
-        $packet->payload = substr(
-            $rawInput,
-            4 + strlen($topic)
-        );
-
-        return $packet;
+        if ($this->qos > 0) {
+            $this->identifier = $this->parseIdentifier($rawInput, 4 + strlen($topic));
+            $this->payload = substr($rawInput, 6 + strlen($topic));
+        } else {
+            $this->payload = substr($rawInput, 4 + strlen($topic));
+        }
     }
 
     /**
@@ -61,16 +56,6 @@ class Publish extends ControlPacket
     public function setTopic($topic)
     {
         $this->topic = $topic;
-        return $this;
-    }
-
-    /**
-     * @param $messageId
-     * @return $this
-     */
-    public function setMessageId($messageId)
-    {
-        $this->messageId = $messageId;
         return $this;
     }
 
@@ -120,6 +105,11 @@ class Publish extends ControlPacket
         return $this->qos;
     }
 
+    public function setPayload($message)
+    {
+        $this->payload = $message;
+    }
+
     /**
      * @return string
      */
@@ -138,7 +128,7 @@ class Publish extends ControlPacket
         return implode([
             $this->getFixedHeader(),
             $this->getVariableHeader(),
-            ($this->qos > 0 ? pack('n', $this->messageId) : ''),
+            ($this->qos > 0 ? pack('n', $this->identifier) : ''),
             $this->getPayload(),
         ]);
     }
