@@ -100,7 +100,7 @@ abstract class ControlPacket {
      */
     protected function getVariableHeader()
     {
-        if (!$this->identifier) {
+        if (is_null($this->identifier)) {
             return '';
         }
         return pack('n', $this->identifier);

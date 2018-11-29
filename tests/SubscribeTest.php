@@ -19,15 +19,16 @@ class SubscribeTest extends TestCase {
         $subscriptionTopic = 'a/b';
         $packet->addSubscription($subscriptionTopic, 0);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(substr($packet->get(), 0, 2)),
-            MessageHelper::getReadableByRawString(chr(130) . chr(8))
+        $this->assertSerialisedPacketEquals(
+            chr(130) . chr(8),
+            substr($packet->get(), 0, 2)
         );
     }
 
     public function testGetHeaderTestFixedHeaderWithTwoSubscribedTopics()
     {
         $packet = new Subscribe();
+        $packet->setIdentifier(12);
 
         $subscriptionTopic = 'a/b';
         $packet->addSubscription($subscriptionTopic, 1);
@@ -35,10 +36,26 @@ class SubscribeTest extends TestCase {
         $subscriptionTopic = 'c/d';
         $packet->addSubscription($subscriptionTopic, 2);
 
-        $this->assertEquals(
-            MessageHelper::getReadableByRawString(substr($packet->get(), 0, 2)),
-            MessageHelper::getReadableByRawString(chr(130) . chr(14))
+        $expected = implode([
+            chr(130),
+            chr(14),
+            chr(0), chr(12),
+            chr(0), chr(3),
+            'a/b',
+            chr(1),
+            chr(0), chr(3),
+            'c/d',
+            chr(2),
+        ]);
+
+        $this->assertEquals(12, $packet->getIdentifier());
+
+        $this->assertSerialisedPacketEquals(
+            chr(130) . chr(14),
+            substr($packet->get(), 0, 2)
         );
+
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
     }
 
     public function testParse()
