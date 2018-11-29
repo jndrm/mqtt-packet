@@ -43,6 +43,8 @@ abstract class ControlPacket {
 
     public function parse($rawInput)
     {
+        // before parsing we need to clean payload
+        $this->payload = '';
         if (static::ID_INDEX > 0) {
             $this->identifier = $this->parseIdentifier($rawInput, static::ID_INDEX);
         }

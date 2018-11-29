@@ -85,9 +85,6 @@ class Connect extends ControlPacket {
     {
         parent::parse($rawInput);
 
-        // clean payload
-        $this->payload = '';
-
         $body = substr($rawInput, 2);
         $protocol = static::readString($body);
 
