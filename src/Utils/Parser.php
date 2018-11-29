@@ -103,7 +103,7 @@ final class Parser {
             case ControlPacketType::DISCONNECT:
                 return 'disconnect';
             default:
-                return 'unknow';
+                return 'unknown';
         }
     }
 }

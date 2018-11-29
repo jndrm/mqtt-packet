@@ -17,6 +17,7 @@ use Drmer\Mqtt\Packet\Subscribe;
 use Drmer\Mqtt\Packet\SubscribeAck;
 use Drmer\Mqtt\Packet\Unsubscribe;
 use Drmer\Mqtt\Packet\UnsubscribeAck;
+use Drmer\Mqtt\Packet\ControlPacketType;
 
 class ParserTest extends TestCase {
     public function testConnect()
@@ -256,5 +257,38 @@ class ParserTest extends TestCase {
         $this->assertEquals(17, $packet->getIdentifier());
 
         $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
+
+    public function testTetCmd()
+    {
+        $this->assertEquals('connect', Parser::getCmd(ControlPacketType::CONNECT));
+
+        $this->assertEquals('connack', Parser::getCmd(ControlPacketType::CONNACK));
+
+        $this->assertEquals('publish', Parser::getCmd(ControlPacketType::PUBLISH));
+
+        $this->assertEquals('puback', Parser::getCmd(ControlPacketType::PUBACK));
+
+        $this->assertEquals('pubrec', Parser::getCmd(ControlPacketType::PUBREC));
+
+        $this->assertEquals('pubrel', Parser::getCmd(ControlPacketType::PUBREL));
+
+        $this->assertEquals('pubcomp', Parser::getCmd(ControlPacketType::PUBCOMP));
+
+        $this->assertEquals('subscribe', Parser::getCmd(ControlPacketType::SUBSCRIBE));
+
+        $this->assertEquals('suback', Parser::getCmd(ControlPacketType::SUBACK));
+
+        $this->assertEquals('unsubscribe', Parser::getCmd(ControlPacketType::UNSUBSCRIBE));
+
+        $this->assertEquals('unsuback', Parser::getCmd(ControlPacketType::UNSUBACK));
+
+        $this->assertEquals('pingreq', Parser::getCmd(ControlPacketType::PINGREQ));
+
+        $this->assertEquals('pingresp', Parser::getCmd(ControlPacketType::PINGRESP));
+
+        $this->assertEquals('disconnect', Parser::getCmd(ControlPacketType::DISCONNECT));
+
+        $this->assertEquals('unknown', Parser::getCmd(0));
     }
 }
