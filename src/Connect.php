@@ -9,7 +9,8 @@ use Drmer\Mqtt\Packet\Protocol\Version4;
  * After a Network Connection is established by a Client to a Server, the
  * first Packet sent from the Client to the Server MUST be a CONNECT Packet.
  */
-class Connect extends ControlPacket {
+class Connect extends ControlPacket
+{
 
     /** @var null|string */
     protected $clientId = null;

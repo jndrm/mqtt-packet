@@ -2,15 +2,15 @@
 
 namespace Drmer\Mqtt\Packet\Protocol;
 
-class Version4 implements Version {
-
-    function getProtocolIdentifierString()
+class Version4 implements Version
+{
+    public function getProtocolIdentifierString()
     {
         return 'MQTT';
     }
 
     /** @return int */
-    function getProtocolVersion()
+    public function getProtocolVersion()
     {
         return 4;
     }

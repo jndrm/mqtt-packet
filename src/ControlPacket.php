@@ -6,7 +6,8 @@ use Drmer\Mqtt\Packet\Protocol\Version;
 use Drmer\Mqtt\Packet\Protocol\Version4;
 use Drmer\Mqtt\Packet\Utils\MessageHelper;
 
-abstract class ControlPacket {
+abstract class ControlPacket
+{
 
     // packet identifer index
     // set this to -1 if subclass need to
@@ -166,7 +167,8 @@ abstract class ControlPacket {
      * @return string
      * @see https://github.com/walkor/mqtt/blob/master/src/Protocols/Mqtt.php#readString
      */
-    public static function readString(&$buffer) {
+    public static function readString(&$buffer)
+    {
         $tmp = unpack('n', $buffer);
         $length = array_pop($tmp);
         if ($length + 2 > strlen($buffer)) {
@@ -190,7 +192,8 @@ abstract class ControlPacket {
      * @return mixed
      * @see https://github.com/walkor/mqtt/blob/master/src/Protocols/Mqtt.php#readShortInt
      */
-    public static function readShortInt(&$buffer) {
+    public static function readShortInt(&$buffer)
+    {
         $tmp = unpack('n', $buffer);
         $buffer = substr($buffer, 2);
         return array_pop($tmp);

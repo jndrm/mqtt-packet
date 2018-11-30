@@ -138,7 +138,7 @@ class Publish extends ControlPacket
         $qosByte = 0;
         if ($this->qos === 1) {
             $qosByte = 1;
-        } else if ($this->qos === 2) {
+        } elseif ($this->qos === 2) {
             $qosByte = 2;
         }
         $byte1 += $qosByte << 1;

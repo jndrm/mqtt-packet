@@ -5,8 +5,8 @@ namespace Drmer\Tests\Mqtt\Packet;
 use Drmer\Mqtt\Packet\SubscribeAck;
 use Drmer\Mqtt\Packet\Protocol\Version4;
 
-class SubscribeAckTest extends TestCase {
-
+class SubscribeAckTest extends TestCase
+{
     public function testGetControlPacketType()
     {
         $packet = new SubscribeAck();

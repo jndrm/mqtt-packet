@@ -5,8 +5,8 @@ namespace Drmer\Tests\Mqtt\Packet;
 use Drmer\Mqtt\Packet\Protocol\Version4;
 use Drmer\Mqtt\Packet\PingRequest;
 
-class PingRequestTest extends TestCase {
-
+class PingRequestTest extends TestCase
+{
     public function testPingRequestControlPacketTypeIsTwelve()
     {
         $this->assertEquals(12, PingRequest::getControlPacketType());

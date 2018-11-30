@@ -5,8 +5,8 @@ namespace Drmer\Tests\Mqtt\Packet;
 use Drmer\Mqtt\Packet\Subscribe;
 use Drmer\Mqtt\Packet\Utils\MessageHelper;
 
-class SubscribeTest extends TestCase {
-
+class SubscribeTest extends TestCase
+{
     public function testSubscribeControlPacketTypeIsEight()
     {
         $this->assertEquals(8, Subscribe::getControlPacketType());

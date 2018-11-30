@@ -9,7 +9,8 @@ use Drmer\Mqtt\Packet\Protocol\Version4;
  * @covers \Drmer\Mqtt\Packet\Protocol\Version4
  *
  */
-class Version4Test extends TestCase {
+class Version4Test extends TestCase
+{
     public function testProtocolIdentifier()
     {
         $version = new Version4();

@@ -2,11 +2,12 @@
 
 namespace Drmer\Mqtt\Packet\Protocol;
 
-interface Version {
+interface Version
+{
 
     /** @return string */
-    function getProtocolIdentifierString();
+    public function getProtocolIdentifierString();
 
     /** @return int */
-    function getProtocolVersion();
+    public function getProtocolVersion();
 }
