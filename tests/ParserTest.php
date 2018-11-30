@@ -19,7 +19,8 @@ use Drmer\Mqtt\Packet\Unsubscribe;
 use Drmer\Mqtt\Packet\UnsubscribeAck;
 use Drmer\Mqtt\Packet\ControlPacketType;
 
-class ParserTest extends TestCase {
+class ParserTest extends TestCase
+{
     public function testConnect()
     {
         $expected = implode([
@@ -259,7 +260,7 @@ class ParserTest extends TestCase {
         $this->assertSerialisedPacketEquals($expected, $packet->get());
     }
 
-    public function testTetCmd()
+    public function testGetCmd()
     {
         $this->assertEquals('connect', Parser::getCmd(ControlPacketType::CONNECT));
 

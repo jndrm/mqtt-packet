@@ -20,7 +20,8 @@ use Drmer\Mqtt\Packet\PingRequest;
 use Drmer\Mqtt\Packet\PingResponse;
 use Drmer\Mqtt\Packet\Disconnect;
 
-final class Parser {
+final class Parser
+{
     public static function parse($rawInput, Version $version=null)
     {
         $packet = static::detectPacket(ord($rawInput{0}) >> 4);

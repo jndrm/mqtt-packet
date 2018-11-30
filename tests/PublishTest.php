@@ -13,8 +13,8 @@ use Drmer\Mqtt\Packet\Protocol\Version4;
  * See http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718039
  * for topic and packet identifier.
  */
-class PublishTest extends TestCase {
-
+class PublishTest extends TestCase
+{
     public function testPublishStandard()
     {
         $this->assertEquals(3, Publish::getControlPacketType());
@@ -156,12 +156,13 @@ class PublishTest extends TestCase {
         $this->assertInstanceOf('Drmer\Mqtt\Packet\Publish', $return);
     }
 
-    public function qosProvider() {
-        return array(
-            array(0, 0b00110000),
-            array(1, 0b00110010),
-            array(2, 0b00110100),
-        );
+    public function qosProvider()
+    {
+        return [
+            [0, 0b00110000],
+            [1, 0b00110010],
+            [2, 0b00110100],
+        ];
     }
 
     /**

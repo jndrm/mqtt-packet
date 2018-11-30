@@ -5,7 +5,8 @@ namespace Drmer\Tests\Mqtt\Packet;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Drmer\Mqtt\Packet\Utils\MessageHelper;
 
-class TestCase extends BaseTestCase {
+class TestCase extends BaseTestCase
+{
     protected function assertSerialisedPacketEquals($expected, $actual)
     {
         $this->assertEquals(

@@ -136,7 +136,7 @@ class ConnectionOptions
      */
     public function populate(array $options = [])
     {
-        foreach($options as $key => $value){
+        foreach ($options as $key => $value) {
             // NB: This can in the future be changed to automatically use setters and enforce validation
             $this->$key = $value;
         }

@@ -4,8 +4,8 @@ namespace Drmer\Tests\Mqtt\Packet;
 
 use Drmer\Mqtt\Packet\ControlPacketType;
 
-class ControlPacketTypeTest extends TestCase {
-
+class ControlPacketTypeTest extends TestCase
+{
     public function testConnect()
     {
         $this->assertEquals(

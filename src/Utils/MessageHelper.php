@@ -2,7 +2,8 @@
 
 namespace Drmer\Mqtt\Packet\Utils;
 
-class MessageHelper {
+class MessageHelper
+{
 
     /**
      * @param $message
@@ -16,7 +17,7 @@ class MessageHelper {
         $return .= "+-----+------+-------+-----+\n";
         for ($index = 0, $lengthOfMessage = strlen($message); $index < $lengthOfMessage; $index++) {
             $return .= '| ' . str_pad($index, 4, ' ');
-            $return .= '| ' . str_pad($index +1 , 5, ' ');
+            $return .= '| ' . str_pad($index +1, 5, ' ');
             $return .= '| ' . str_pad((ord($message{$index}) > 32 ? $message{$index} : ("(" . ord($message{$index})) . ")"), 6, ' ');
             $return .= '| ' . str_pad(ord($message{$index}), 4, ' ');
             $return .= "|\n";
@@ -24,5 +25,4 @@ class MessageHelper {
         $return .= "+-----+------+-------+-----+\n";
         return $return;
     }
-
 }

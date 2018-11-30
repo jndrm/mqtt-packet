@@ -6,8 +6,8 @@ use Drmer\Mqtt\Packet\Protocol\Version4;
 use Drmer\Mqtt\Packet\Connect;
 use Drmer\Mqtt\Packet\Utils\MessageHelper;
 
-class ConnectTest extends TestCase {
-
+class ConnectTest extends TestCase
+{
     public function testConnectControlPacketTypeIsOne()
     {
         $this->assertEquals(1, Connect::getControlPacketType());

@@ -6,9 +6,9 @@ namespace Drmer\Mqtt\Packet;
  * The SUBSCRIBE Packet is sent from the Client to the Server to create
  * one or more Subscriptions.
  */
-class Subscribe extends ControlPacket {
-
-    protected $topicFilters = array();
+class Subscribe extends ControlPacket
+{
+    protected $topicFilters = [];
 
     protected $topics = [];
 

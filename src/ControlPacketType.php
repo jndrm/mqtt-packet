@@ -2,8 +2,8 @@
 
 namespace Drmer\Mqtt\Packet;
 
-class ControlPacketType {
-
+class ControlPacketType
+{
     const CONNECT = 1;
     const CONNACK = 2;
     const PUBLISH = 3;
