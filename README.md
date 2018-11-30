@@ -1,4 +1,4 @@
-# packet
+# mqtt-packet
 MQTT 3.1.1 Packets in PHP *This library is still unstable, DO NOT USE THIS IN PRODUCTION*
 
 [![Build Status](https://travis-ci.org/jndrm/mqtt-packet.svg?branch=master)](https://travis-ci.org/jndrm/mqtt-packet)
