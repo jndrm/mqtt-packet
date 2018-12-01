@@ -59,4 +59,13 @@ class ConnectionOptionsTest extends TestCase
         $this->assertSame($data['willQos'], $options->willQos, 'Incorrect will quality of service set');
         $this->assertSame($data['willRetain'], $options->willRetain, 'Incorrect will retain state set');
     }
+
+    public function testCleanSessionWithEmptyClientId()
+    {
+        $option = $this->makeConnectionOptions([
+            'clientId' => '',
+            'cleanSession' => false,
+        ]);
+        $this->assertTrue($option->cleanSession);
+    }
 }
