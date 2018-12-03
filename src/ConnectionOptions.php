@@ -126,6 +126,8 @@ class ConnectionOptions
         }
         if (is_null($this->clientId)) {
             $this->clientId = substr(md5(microtime()), 0, 23);
+        } elseif ('' === $this->clientId && $this->cleanSession == false) {
+            $this->cleanSession = true;
         }
     }
 

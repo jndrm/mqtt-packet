@@ -65,6 +65,70 @@ class ConnectTest extends TestCase
         );
     }
 
+    public function testConnectWithCleanSession()
+    {
+        $packet = new Connect([
+            'clientId' => '1',
+            'cleanSession' => true,
+        ]);
+        $expected = implode([
+            chr(16),
+            chr(13),
+            chr(0), chr(4),
+            'MQTT',
+            chr(4),
+            chr(2),
+            chr(0),
+            chr(0),
+            chr(0),
+            chr(1),
+            '1',
+        ]);
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
+
+    public function testConnectWithEmptyClientId()
+    {
+        $packet = new Connect([
+            'clientId' => '',
+        ]);
+        $expected = implode([
+            chr(16),
+            chr(12),
+            chr(0), chr(4),
+            'MQTT',
+            chr(4),
+            chr(2),
+            chr(0),
+            chr(0),
+            chr(0),
+            chr(0),
+        ]);
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
+
+    public function testConnectWithNotCleanSession()
+    {
+        $packet = new Connect([
+            'clientId' => '1',
+            'cleanSession' => false,
+        ]);
+        $expected = implode([
+            chr(16),
+            chr(13),
+            chr(0), chr(4),
+            'MQTT',
+            chr(4),
+            chr(0),
+            chr(0),
+            chr(0),
+            chr(0),
+            chr(1),
+            '1',
+        ]);
+        $this->assertSerialisedPacketEquals($expected, $packet->get());
+    }
+
     public function testGetHeaderTestVariableHeaderWithConnectFlagWillFlag()
     {
         $packet = new Connect([
