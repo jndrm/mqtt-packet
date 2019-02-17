@@ -88,7 +88,44 @@ abstract class ControlPacket
         $byte2 = $this->getRemainingLength();
 
         return chr($byte1)
-             . chr($byte2);
+             . static::encodeLength($byte2);
+    }
+
+    /**
+     *
+     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc304802782
+     *
+     */
+    protected static function encodeLength($len)
+    {
+        $res = '';
+        do {
+            $digit = $len % 128;
+            $len = $len >> 7;
+            if ($len > 0) {
+                $digit = ($digit | 0x80);
+            }
+            $res .= chr($digit);
+        } while ($len > 0);
+        return $res;
+    }
+
+    /**
+     *
+     * @see http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc304802782
+     *
+     */
+    protected static function decodeLength(&$startIndex, $rawInput)
+    {
+        $multi = 1;
+        $value = 0;
+        do {
+            $digit = ord($rawInput{$startIndex});
+            $value += ($digit & 127) * $multi;
+            $multi *= 128;
+            $startIndex += 1;
+        } while (($digit & 128) != 0);
+        return $value;
     }
 
     /**

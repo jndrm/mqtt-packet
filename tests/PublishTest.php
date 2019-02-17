@@ -254,6 +254,34 @@ class PublishTest extends TestCase
         $this->assertEquals('My payload', $parsedPacket->getPayload());
     }
 
+    public function testLongPayload()
+    {
+        $expectedPacket = new Publish();
+        $topic = '00000000-0000-0000-0000-000000000000';
+        $expectedPacket->setTopic($topic);
+        $payload = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+        $expectedPacket->setPayload($payload);
+
+        $input =
+            chr(0b00110000) .
+            chr(228) . chr(3) .
+            chr(0) .
+            chr(36) .
+            $topic .
+            $payload;
+
+        $this->assertSerialisedPacketEquals($input, $expectedPacket->get());
+        $parsedPacket = $this->parse($input);
+        $this->assertPacketEquals($expectedPacket, $parsedPacket);
+        $this->assertEquals($topic, $parsedPacket->getTopic());
+        $this->assertEquals($payload, $parsedPacket->getPayload());
+    }
+
     private function assertPacketEquals(Publish $expected, Publish $actual)
     {
         $this->assertEquals($expected, $actual);
