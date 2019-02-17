@@ -28,7 +28,11 @@ class Publish extends ControlPacket
     public function parse($rawInput)
     {
         parent::parse($rawInput);
-        $topic = static::getPayloadLengthPrefixFieldInRawInput(2, $rawInput);
+
+        $startIndex = 1;
+        $payloadLength = static::decodeLength($startIndex, $rawInput);
+
+        $topic = static::getPayloadLengthPrefixFieldInRawInput($startIndex, $rawInput);
         $this->setTopic($topic);
 
         $byte1 = $rawInput{0};
@@ -42,10 +46,10 @@ class Publish extends ControlPacket
             $this->setDup(($byte1 & 8) === 8);
         }
         if ($this->qos > 0) {
-            $this->identifier = $this->parseIdentifier($rawInput, 4 + strlen($topic));
-            $this->payload = substr($rawInput, 6 + strlen($topic));
+            $this->identifier = $this->parseIdentifier($rawInput, ($startIndex + 2) + strlen($topic));
+            $this->payload = substr($rawInput, ($startIndex + 4) + strlen($topic));
         } else {
-            $this->payload = substr($rawInput, 4 + strlen($topic));
+            $this->payload = substr($rawInput, ($startIndex + 2) + strlen($topic));
         }
     }
 
